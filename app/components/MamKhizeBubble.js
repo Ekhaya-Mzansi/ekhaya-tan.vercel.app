@@ -8,13 +8,13 @@ export default function MamKhizeBubble() {
   const [credits, setCredits] = useState(60)
   const [glowing, setGlowing] = useState(false)
   const [listening, setListening] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const recognitionRef = useRef(null)
   const messageEndRef = useRef(null)
 
-  // Mount check
+  // Set client flag
   useEffect(() => {
-    setMounted(true)
+    setIsClient(true)
   }, [])
 
   // Load credits from localStorage
@@ -41,7 +41,7 @@ export default function MamKhizeBubble() {
 
   // Initialize Web Speech API
   useEffect(() => {
-    if (typeof window === 'undefined' || !mounted) return
+    if (typeof window === 'undefined' || !isClient) return
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
@@ -89,7 +89,7 @@ export default function MamKhizeBubble() {
         console.log('Error stopping recognition')
       }
     }
-  }, [mounted])
+  }, [isClient])
 
   const triggerWakeWord = () => {
     setGlowing(true)
@@ -138,8 +138,6 @@ export default function MamKhizeBubble() {
     }, 500)
   }
 
-  if (!mounted) return null
-
   return (
     <>
       {/* Floating Button */}
@@ -173,7 +171,7 @@ export default function MamKhizeBubble() {
           }}
         >
           👑
-          {listening && (
+          {listening && isClient && (
             <div
               style={{
                 position: 'absolute',
@@ -191,7 +189,7 @@ export default function MamKhizeBubble() {
       </div>
 
       {/* Chat Box */}
-      {chatOpen && (
+      {chatOpen && isClient && (
         <div
           style={{
             position: 'fixed',
