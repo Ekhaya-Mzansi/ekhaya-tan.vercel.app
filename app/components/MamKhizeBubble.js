@@ -146,7 +146,7 @@ export default function MamKhizeBubble() {
       {/* Floating Draggable Button */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className={`fixed w-20 h-20 rounded-full flex items-center justify-center text-4xl cursor-grab active:cursor-grabbing border-4 border-white shadow-lg transition-all duration-300 z-9999 ${
+        className={`fixed w-20 h-20 rounded-full flex items-center justify-center text-4xl cursor-grab active:cursor-grabbing border-4 border-white shadow-lg transition-all duration-300 ${
           glowing
             ? 'bg-gradient-to-br from-[#22c55e] to-[#5D4037] shadow-[0_0_30px_rgba(34,197,94,0.8)]'
             : 'bg-gradient-to-br from-[#22c55e] to-[#5D4037]'
@@ -154,7 +154,7 @@ export default function MamKhizeBubble() {
         style={{
           bottom: '70px',
           right: '20px',
-          zIndex: 9999,
+          zIndex: 50,
         }}
       >
         👑
@@ -172,7 +172,7 @@ export default function MamKhizeBubble() {
             right: '20px',
             width: '320px',
             height: '400px',
-            zIndex: 9998,
+            zIndex: 49,
           }}
         >
           {/* Header */}
