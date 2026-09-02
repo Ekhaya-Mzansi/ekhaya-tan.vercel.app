@@ -6,7 +6,6 @@ export default function Page(){
   <div className="min-h-screen bg-[#efe9d9] pb-[90px]">
     <div className="bg-[#2b1d11] p-3 flex justify-between items-center rounded-b-[20px]">
       <div className="text-center"><div className="text-2xl">🛖</div><div className="text-[#ffb700] font-black">Ekhaya</div><div className="text-[10px] text-[#ffb700]">From Kasi <span className="[...]
-      <div><div className="flex gap-2 items-center"><div className="bg-[#3d2a1a] w-9 h-9 rounded-full flex items-center justify-center">🔍</div><div className="bg-[#3d2a1a] px-3 py-1.5 rounded-fu[...]
     </div>
     
     {/* Scrollable Stories/Bubbles Section */}
