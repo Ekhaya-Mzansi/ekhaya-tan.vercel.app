@@ -1,4 +1,6 @@
 "use client"
+import MamKhizeBubble from './components/MamKhizeBubble'
+
 export default function Page(){
  return(
   <div className="min-h-screen bg-[#efe9d9] pb-[90px]">
@@ -47,6 +49,9 @@ export default function Page(){
       <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800" className="w-full h-[360px] object-cover"/>
       <div className="p-3 flex justify-between text-[13px] text-zinc-500 border-t"><span>👍 178</span><span>21 comments • 9 shares</span></div>
     </div>
+    
+    <MamKhizeBubble />
+    
     <div className="fixed bottom-0 left-0 right-0 bg-[#2b1d11] flex justify-around py-2.5 rounded-t-[20px]">
       <div className="text-center text-[#ffb700]"><div>🛖</div><div className="text-xs">Ekhaya</div><div className="text-[10px]">Home</div></div>
       <div className="text-center text-zinc-500"><div>🧺</div><div className="text-xs">Makethe</div><div className="text-[10px]">Market</div></div>
