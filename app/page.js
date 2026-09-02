@@ -10,7 +10,12 @@ export default function Page(){
       <div style={{padding:14, display:'flex', gap:10}}>
         <div style={{width:40, height:40, borderRadius:'50%', background:'#ccc'}}></div>
         <div><b>Kagiso</b><div style={{fontSize:12, color:'#666'}}>17h • Meadowlands</div></div>
-      </div>
+      </div><div style={{background:'white', margin:16, borderRadius:16, padding:16}}>
+      <div style={{fontWeight:900}}>My Profile Info</div>
+      <input placeholder="Your Name" style={{width:'100%', padding:12, background:'#efe9d9', borderRadius:12, marginTop:12, border:'none'}} />
+      <input placeholder="Kasi" style={{width:'100%', padding:12, background:'#efe9d9', borderRadius:12, marginTop:8, border:'none'}} />
+      <button style={{width:'100%', background:'#2b1d11', color:'#ffb700', padding:12, borderRadius:12, fontWeight:900, marginTop:8}}>Save</button>
+    </div>
       <div style={{padding:'0 14px 10px', fontWeight:600}}>Golden hour over the ekasi rooftops, home is beautiful</div>
       <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800" style={{width:'100%', height:350, objectFit:'cover'}} />
     </div>
