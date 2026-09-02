@@ -1,6 +1,1 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-
-const root = createRoot(document.getElementById('root'))
-root.render(<App />)
+// src/main.jsx removed — Next.js app router is used instead. This file remains as a placeholder. Delete if not needed.
