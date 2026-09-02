@@ -1,0 +1,5 @@
+Redeploy trigger for Vercel
+
+Timestamp: 2026-09-02T12:21:40Z
+
+This file is intentionally updated to trigger a Vercel redeploy.
