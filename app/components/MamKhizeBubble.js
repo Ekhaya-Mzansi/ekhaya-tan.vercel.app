@@ -8,8 +8,14 @@ export default function MamKhizeBubble() {
   const [credits, setCredits] = useState(60)
   const [glowing, setGlowing] = useState(false)
   const [listening, setListening] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const recognitionRef = useRef(null)
   const messageEndRef = useRef(null)
+
+  // Mount check
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Load credits from localStorage
   useEffect(() => {
@@ -35,7 +41,7 @@ export default function MamKhizeBubble() {
 
   // Initialize Web Speech API
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !mounted) return
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
@@ -56,15 +62,12 @@ export default function MamKhizeBubble() {
     }
 
     recognitionRef.current.onresult = (event) => {
-      let interimTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript
         if (event.results[i].isFinal) {
           if (transcript.toLowerCase().includes('mamkhize')) {
             triggerWakeWord()
           }
-        } else {
-          interimTranscript += transcript
         }
       }
     }
@@ -73,11 +76,10 @@ export default function MamKhizeBubble() {
       console.error('Speech recognition error:', event.error)
     }
 
-    // Start listening
     try {
       recognitionRef.current.start()
     } catch (e) {
-      console.log('Already listening or error starting recognition')
+      console.log('Recognition already started')
     }
 
     return () => {
@@ -87,13 +89,12 @@ export default function MamKhizeBubble() {
         console.log('Error stopping recognition')
       }
     }
-  }, [])
+  }, [mounted])
 
   const triggerWakeWord = () => {
     setGlowing(true)
     setTimeout(() => setGlowing(false), 3000)
 
-    // Play wake word response
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       const utterance = new SpeechSynthesisUtterance("Yebo mntanami? Ndi khona")
       utterance.lang = 'zu-ZA'
@@ -101,19 +102,16 @@ export default function MamKhizeBubble() {
       window.speechSynthesis.speak(utterance)
     }
 
-    // Open chat
     setChatOpen(true)
   }
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!input.trim()) return
 
-    // Add user message
     const userMessage = { role: 'user', text: input }
     setMessages([...messages, userMessage])
     setInput('')
 
-    // Simple gogo response logic
     const gogoResponses = [
       'Ayoba ngubani, uxolo ukuthula impilo yakho',
       'Uyagonda kahle mntanami',
@@ -128,7 +126,6 @@ export default function MamKhizeBubble() {
       const gogoMessage = { role: 'gogo', text: response }
       setMessages((prev) => [...prev, gogoMessage])
 
-      // Deduct credits and speak
       if (credits > 0) {
         setCredits(credits - 1)
         if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -141,72 +138,141 @@ export default function MamKhizeBubble() {
     }, 500)
   }
 
+  if (!mounted) return null
+
   return (
     <>
-      {/* Floating Draggable Button */}
-      <button
-        onClick={() => setChatOpen(!chatOpen)}
-        className={`fixed w-20 h-20 rounded-full flex items-center justify-center text-4xl cursor-grab active:cursor-grabbing border-4 border-white shadow-lg transition-all duration-300 ${
-          glowing
-            ? 'bg-gradient-to-br from-[#22c55e] to-[#5D4037] shadow-[0_0_30px_rgba(34,197,94,0.8)]'
-            : 'bg-gradient-to-br from-[#22c55e] to-[#5D4037]'
-        }`}
+      {/* Floating Button */}
+      <div
         style={{
+          position: 'fixed',
           bottom: '70px',
           right: '20px',
           zIndex: 50,
         }}
       >
-        👑
-        {listening && (
-          <div className="absolute w-3 h-3 bg-green-400 rounded-full bottom-2 right-2 animate-pulse"></div>
-        )}
-      </button>
+        <button
+          onClick={() => setChatOpen(!chatOpen)}
+          style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            border: '4px solid white',
+            background: glowing
+              ? 'linear-gradient(135deg, #22c55e 0%, #5D4037 100%)'
+              : 'linear-gradient(135deg, #22c55e 0%, #5D4037 100%)',
+            boxShadow: glowing
+              ? '0 0 30px rgba(34,197,94,0.8), 0 4px 6px rgba(0,0,0,0.1)'
+              : '0 4px 6px rgba(0,0,0,0.1)',
+            fontSize: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'grab',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          👑
+          {listening && (
+            <div
+              style={{
+                position: 'absolute',
+                width: '12px',
+                height: '12px',
+                backgroundColor: '#22c55e',
+                borderRadius: '50%',
+                bottom: '8px',
+                right: '8px',
+                animation: 'pulse 1s infinite',
+              }}
+            />
+          )}
+        </button>
+      </div>
 
       {/* Chat Box */}
       {chatOpen && (
         <div
-          className="fixed bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden"
           style={{
+            position: 'fixed',
             bottom: '100px',
             right: '20px',
             width: '320px',
             height: '400px',
+            backgroundColor: 'white',
+            borderRadius: '20px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
             zIndex: 49,
           }}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#5D4037] to-[#22c55e] text-white p-4 flex justify-between items-center">
+          <div
+            style={{
+              background: 'linear-gradient(90deg, #5D4037 0%, #22c55e 100%)',
+              color: 'white',
+              padding: '16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <div>
-              <h3 className="font-bold text-lg">Gogo MamKhize</h3>
-              <p className="text-xs opacity-90">Credits: {credits}</p>
+              <h3 style={{ margin: '0 0 4px 0', fontWeight: 'bold', fontSize: '18px' }}>Gogo MamKhize</h3>
+              <p style={{ margin: 0, fontSize: '12px', opacity: 0.9 }}>Credits: {credits}</p>
             </div>
             <button
               onClick={() => setChatOpen(false)}
-              className="text-xl font-bold hover:bg-white hover:bg-opacity-20 w-8 h-8 rounded-full flex items-center justify-center"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'white',
+                fontSize: '20px',
+                cursor: 'pointer',
+                padding: '8px',
+              }}
             >
               ✕
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+          <div
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '16px',
+              backgroundColor: '#f9fafb',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
             {messages.length === 0 && (
-              <div className="text-center text-gray-400 mt-8">
-                <p className="text-sm">Ayoba! Say "MamKhize" to start 👋</p>
+              <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '32px' }}>
+                <p style={{ fontSize: '14px' }}>Ayoba! Say "MamKhize" to start 👋</p>
               </div>
             )}
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                style={{
+                  display: 'flex',
+                  justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                }}
               >
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
-                    msg.role === 'user'
-                      ? 'bg-[#22c55e] text-white rounded-br-none'
-                      : 'bg-[#5D4037] bg-opacity-10 text-gray-800 rounded-bl-none'
-                  }`}
+                  style={{
+                    maxWidth: '70%',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    fontSize: '14px',
+                    backgroundColor: msg.role === 'user' ? '#22c55e' : '#5D4037',
+                    backgroundOpacity: msg.role === 'gogo' ? 0.1 : 1,
+                    color: msg.role === 'user' ? 'white' : '#1f2937',
+                  }}
                 >
                   {msg.text}
                 </div>
@@ -215,33 +281,66 @@ export default function MamKhizeBubble() {
             <div ref={messageEndRef} />
           </div>
 
-          {/* Input Section */}
-          <div className="border-t p-4 bg-white">
+          {/* Input */}
+          <div style={{ borderTop: '1px solid #e5e7eb', padding: '16px', backgroundColor: 'white' }}>
             {credits > 0 ? (
-              <div className="flex gap-2">
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Type message..."
-                  className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#22c55e]"
+                  style={{
+                    flex: 1,
+                    border: '1px solid #d1d5db',
+                    borderRadius: '20px',
+                    padding: '12px 16px',
+                    fontSize: '14px',
+                    outline: 'none',
+                  }}
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="bg-gradient-to-r from-[#22c55e] to-[#5D4037] text-white px-4 py-2 rounded-full font-semibold text-sm hover:shadow-lg transition-all"
+                  style={{
+                    background: 'linear-gradient(90deg, #22c55e 0%, #5D4037 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 16px',
+                    borderRadius: '20px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                  }}
                 >
                   Send
                 </button>
               </div>
             ) : (
-              <button className="w-full bg-[#5D4037] text-white py-2 rounded-full font-semibold text-sm hover:bg-opacity-90">
+              <button
+                style={{
+                  width: '100%',
+                  backgroundColor: '#5D4037',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px',
+                  borderRadius: '20px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
                 Refill R50 to talk
               </button>
             )}
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
 
       {/* TODO: Replace speechSynthesis with ElevenLabs API + ChatGPT when credits system is live */}
     </>
